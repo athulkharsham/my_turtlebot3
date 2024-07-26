@@ -1,0 +1,11 @@
+# Goal
+bool start_docking
+---
+# Result
+bool docking_completed
+string message
+---
+# Feedback
+float64 offset_x
+float64 offset_y
+float64 offset_theta
