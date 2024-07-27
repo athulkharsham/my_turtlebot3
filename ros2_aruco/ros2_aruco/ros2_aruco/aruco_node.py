@@ -48,7 +48,7 @@ class ArucoNode(rclpy.node.Node):
         # Declare and read parameters
         self.declare_parameter(
             name="marker_size",
-            value=0.0625,
+            value=0.10,
             descriptor=ParameterDescriptor(
                 type=ParameterType.PARAMETER_DOUBLE,
                 description="Size of the markers in meters.",
@@ -57,7 +57,7 @@ class ArucoNode(rclpy.node.Node):
 
         self.declare_parameter(
             name="aruco_dictionary_id",
-            value="DICT_5X5_250",
+            value="DICT_5X5_1000",
             descriptor=ParameterDescriptor(
                 type=ParameterType.PARAMETER_STRING,
                 description="Dictionary that was used to generate markers.",
@@ -84,7 +84,7 @@ class ArucoNode(rclpy.node.Node):
 
         self.declare_parameter(
             name="camera_frame",
-            value="",
+            value="camera_rgb_frame",
             descriptor=ParameterDescriptor(
                 type=ParameterType.PARAMETER_STRING,
                 description="Camera optical frame to use.",
@@ -163,10 +163,10 @@ class ArucoNode(rclpy.node.Node):
             self.get_logger().warn("No camera info has been received!")
             return
 
-        cv_image = self.bridge.imgmsg_to_cv2(img_msg, desired_encoding="mono8")
+        cv_image = self.bridge.imgmsg_to_cv2(img_msg, desired_encoding="rgb8")
 
         # Debug image properties
-        self.get_logger().info(f"Image dimensions: {cv_image.shape}")
+        # self.get_logger().info(f"Image dimensions: {cv_image.shape}")
         markers = ArucoMarkers()
         pose_array = PoseArray()
         if self.camera_frame == "":

@@ -69,6 +69,12 @@ def generate_launch_description():
         }.items()
     )
 
+    rviz_diplay = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_file_dir, 'display.launch.py')
+        )
+    )
+
     ld = LaunchDescription()
 
     # Add the commands to the launch description
@@ -76,5 +82,6 @@ def generate_launch_description():
     ld.add_action(gzclient_cmd)
     ld.add_action(robot_state_publisher_cmd)
     ld.add_action(spawn_turtlebot_cmd)
+    ld.add_action(rviz_diplay)
 
     return ld

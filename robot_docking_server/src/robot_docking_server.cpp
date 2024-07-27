@@ -21,8 +21,6 @@ DockingServerNode::DockingServerNode() :
         cb_group_
     );
 
-    goal_pose_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/goal_pose", 10);
-
     nav2_action_client_ = rclcpp_action::create_client<NavigateToPose>(
         this,
         "navigate_to_pose"
@@ -39,6 +37,9 @@ DockingServerNode::DockingServerNode() :
         std::chrono::milliseconds(100),
         std::bind(&DockingServerNode::timer_callback, this)
     );
+    aruco_subscription_ = create_subscription<geometry_msgs::msg::PoseArray>(
+        "/aruco_poses", 10, 
+        std::bind(&DockingServerNode::aruco_pose_callback, this, _1));
 }
 
 
@@ -96,8 +97,6 @@ void DockingServerNode::execute_goal(
         this->goal_handle_ = goal_handle;
     }
 
-    bool start_docking = goal_handle->get_goal()->start_docking;
-
     auto result = std::make_shared<Docking::Result>();
     auto feedback = std::make_shared<Docking::Feedback>();
 
@@ -121,7 +120,6 @@ void DockingServerNode::execute_goal(
                     result->message = "Goal is cancelled";
                     goal_handle->canceled(result);
                 }
-                start_docking = false;
                 return;
             }
         }
@@ -131,6 +129,7 @@ void DockingServerNode::execute_goal(
             result->docking_completed = is_docking_completed_;
             x_offset_ = 5.0;
             y_offset_ = 5.0;
+            state_ = State::INIT_DOCKING;
             if (is_docking_completed_) 
             {
                 result->message = "Success";
@@ -153,41 +152,52 @@ void DockingServerNode::execute_goal(
             theta_offset_ = 0.0;
             if(send_nav2_goal())
             {
+                RCLCPP_INFO(get_logger(), "Go to Prepose");
                 state_ = State::MOVE_TO_PREPOSE;
             }
             break;
 
         case State::MOVE_TO_PREPOSE:
-            // RCLCPP_INFO(get_logger(), "Move to Prepose");
             if(is_pre_pose_goal_reached_)
             {
+                RCLCPP_INFO(get_logger(), "Go to Linear Movement");
                 is_pre_pose_goal_reached_= false;
                 state_ = State::LINEAR_MOVEMENT;
             }
             break;
 
         case State::LINEAR_MOVEMENT:
-            // RCLCPP_INFO(get_logger(), "Linear Movement");
             publish_cmd_vel(0.02, 0.0);
             if(y_offset_ <= 0.03)
             {   
+                RCLCPP_INFO(get_logger(), "Go to Angular Movement");
                 publish_cmd_vel(0.0, 0.0);
                 state_ = State::ANGULAR_MOVEMENT;
             }
             break;
 
         case State::ANGULAR_MOVEMENT:
-            RCLCPP_INFO(get_logger(), "Angular Movement");
-            state_ = State::GO_TO_DOCK;
+            publish_cmd_vel(0.0, -0.05);
+            if(theta_offset_ <= 0.02)
+            {
+                RCLCPP_INFO(get_logger(), "Go to Final Docking");
+                publish_cmd_vel(0.0, 0.0);
+                state_ = State::GO_TO_DOCK;
+            }
             break;
 
         case State::GO_TO_DOCK: 
-            RCLCPP_INFO(get_logger(), "Go to Dock");
-            state_ = State::INIT_DOCKING;
-            result->message =  "docking done";
-            result->docking_completed = true;
-            goal_handle->succeed(result);
-            return;
+            publish_cmd_vel(0.12, 0.0);
+            if(x_offset_ <=0.05)
+            {
+                RCLCPP_INFO(get_logger(), "Docking Completed");
+                publish_cmd_vel(0.0, 0.0);
+                state_ = State::INIT_DOCKING;
+                result->message =  "docking done";
+                result->docking_completed = true;
+                goal_handle->succeed(result);
+                return;
+            }
 
         default:
             break;
@@ -214,13 +224,13 @@ bool DockingServerNode::send_nav2_goal()
     auto goal_msg = NavigateToPose::Goal();
     goal_msg.pose.header.stamp = this->now();
     goal_msg.pose.header.frame_id = "map";
-    goal_msg.pose.pose.position.x = -1.227;
-    goal_msg.pose.pose.position.y = -0.1979;
+    goal_msg.pose.pose.position.x = -0.9876;
+    goal_msg.pose.pose.position.y = -0.2204;
 
     goal_msg.pose.pose.orientation.x = 0.0;
     goal_msg.pose.pose.orientation.y = 0.0;
-    goal_msg.pose.pose.orientation.z = 0.707;
-    goal_msg.pose.pose.orientation.w = 0.707;
+    goal_msg.pose.pose.orientation.z = 0.6255;
+    goal_msg.pose.pose.orientation.w = 0.7803;
 
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.result_callback = std::bind(&DockingServerNode::result_callback, this, _1);
@@ -255,7 +265,6 @@ void DockingServerNode::publish_cmd_vel(double linear, double angular)
     cmd_vel_msg.linear.x = linear;
     cmd_vel_msg.angular.z = angular;
     cmd_vel_publisher_->publish(cmd_vel_msg);
-    RCLCPP_INFO(this->get_logger(), "Published cmd_vel: linear.x = %f, angular.z = %f", cmd_vel_msg.linear.x, cmd_vel_msg.angular.z);
 }
 
 void DockingServerNode::timer_callback()
@@ -284,13 +293,48 @@ void DockingServerNode::timer_callback()
         );
         tf2::Matrix3x3 m(q);
         m.getRPY(roll, pitch, yaw);
-
+        theta_offset_ = yaw;
         //Log the transform
-        RCLCPP_INFO(this->get_logger(), "x: %f , y: %f", x_offset_, y_offset_);
+        // RCLCPP_INFO(this->get_logger(), "x: %f , y: %f , theta: %f", x_offset_, y_offset_, theta_offset_);
     }
     catch (const tf2::TransformException &ex)
     {
-        RCLCPP_ERROR(this->get_logger(), "Could not transform: %s", ex.what());
+        // RCLCPP_ERROR(this->get_logger(), "Could not transform: %s", ex.what());
+    }
+}
+
+void DockingServerNode::aruco_pose_callback(const geometry_msgs::msg::PoseArray &msg)
+{
+
+    for (const auto &pose : msg.poses)
+    {
+        // Convert the pose to a Transform
+        tf2::Transform transform;
+        tf2::fromMsg(pose, transform);
+
+        // Extract yaw from the transform
+        tf2::Matrix3x3 mat(transform.getRotation());
+        double roll, pitch, yaw;
+        mat.getRPY(roll, pitch, yaw);
+
+        // Log the yaw angle
+        // RCLCPP_INFO(this->get_logger(), "Yaw angle: %f", yaw);
+        geometry_msgs::msg::Twist vel_msg;
+        if(DockingServerNode::state_ == State::GO_TO_DOCK)
+        {
+            angleController(vel_msg, yaw);
+            DockingServerNode::cmd_vel_publisher_->publish(vel_msg);
+        }
+    }
+
+}
+
+void DockingServerNode::angleController(geometry_msgs::msg::Twist &vel_msg, double yaw)
+{
+    float ang_vel = DockingServerNode::ANGULAR_GAIN * yaw;
+    if(yaw >= 0.01)
+    {
+        vel_msg.angular.z = ang_vel;
     }
 }
 

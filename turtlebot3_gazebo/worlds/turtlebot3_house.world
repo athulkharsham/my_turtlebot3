@@ -13,7 +13,7 @@
     <include>
       <uri>model://charging_dock</uri>
       <static>true</static>
-      <pose>-0.2 3.5 0.0 0 0 3.14</pose>
+      <pose>-0.2 3.32 0.0 0 0 3.14</pose>
     </include>
 
     <scene>

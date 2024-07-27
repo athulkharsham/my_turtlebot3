@@ -13,11 +13,12 @@ find_package(robot_interfaces REQUIRED)
 find_package(nav2_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 include_directories(include)
 
 add_executable(robot_docking_server src/robot_docking_server.cpp)
-ament_target_dependencies(robot_docking_server rclcpp rclcpp_action robot_interfaces geometry_msgs tf2_ros nav2_msgs)
+ament_target_dependencies(robot_docking_server rclcpp rclcpp_action robot_interfaces geometry_msgs tf2_ros nav2_msgs tf2_geometry_msgs)
 
 install(
   DIRECTORY include
