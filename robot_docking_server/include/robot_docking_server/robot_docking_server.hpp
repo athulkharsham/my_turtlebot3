@@ -32,6 +32,7 @@ class DockingServerNode : public rclcpp::Node
 {
 public:
     DockingServerNode();
+    constexpr static float LINEAR_GAIN = 0.8f;
     constexpr static float ANGULAR_GAIN = 0.8f;
     
 private:
@@ -58,7 +59,7 @@ private:
 
     void aruco_pose_callback(const geometry_msgs::msg::PoseArray &msg);
 
-    void angleController(geometry_msgs::msg::Twist &vel_msg, double yaw);
+    void docking_controller(geometry_msgs::msg::Twist &vel_msg, double error_x, double error_y, double yaw);
 
     /*Attributes*/
     rclcpp_action::Server<Docking>::SharedPtr robot_docking_server_;
