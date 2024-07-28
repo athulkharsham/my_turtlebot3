@@ -57,4 +57,10 @@ def generate_launch_description():
                 'robot_description': robot_desc
             }],
         ),
+        Node(
+            package='robot_docking_server',
+            executable='robot_pose_publisher',
+            name='robot_pose_publisher',
+            output='screen',
+        ),
     ])
