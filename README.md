@@ -38,25 +38,21 @@ To begin with
 
 1. Start the robot stack
 ```sh
-$ ros2 launch turtlebot3_gazebo turtlebot3_house.launch.py
+$ ros2 launch turtlebot3_gazebo turtlebot3_my_world.launch.py
 ```
 2. Start slam
 ```sh
-$ ros2 launch nav2_bringup slam_launch.py
+$ ros2 launch nav2_bringup slam_launch.py use_sim_time:=True
 ```
 3. Start Navigation
 ```sh
-$ ros2 launch nav2_bringup navigation_launch.py
+$ ros2 launch nav2_bringup navigation_launch.py use_sim_time:=True
 ```
-4. Run explore lite with param values
-```sh
-$ ros2 run explore_lite explore --ros-args --params-file src/m-explore-ros2/explore/config/params.yaml
-```
-5. Launch explore lite 
+4. Launch explore lite 
 ```sh
 $ ros2 launch explore_lite explore.launch.py
 ```
-6. Resume exploration if stuck 
+5. Resume exploration if stuck 
 ```sh
 $ ros2 topic pub /explore/resume std_msgs/msg/Bool "data: true"
 ```
