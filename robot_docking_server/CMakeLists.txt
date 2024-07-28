@@ -20,6 +20,9 @@ include_directories(include)
 add_executable(robot_docking_server src/robot_docking_server.cpp)
 ament_target_dependencies(robot_docking_server rclcpp rclcpp_action robot_interfaces geometry_msgs tf2_ros nav2_msgs tf2_geometry_msgs)
 
+add_executable(robot_pose_publisher src/robot_pose_publisher.cpp)
+ament_target_dependencies(robot_pose_publisher rclcpp geometry_msgs tf2_ros tf2_geometry_msgs)
+
 install(
   DIRECTORY include
   DESTINATION include
@@ -27,6 +30,7 @@ install(
 
 install(TARGETS
   robot_docking_server
+  robot_pose_publisher
   DESTINATION lib/${PROJECT_NAME}/
 )
 
