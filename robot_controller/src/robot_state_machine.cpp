@@ -1,4 +1,8 @@
 #include "robot_controller/robot_state_machine.hpp"
+#include <chrono>
+#include <string>
+#include <cstdlib>
+
 
 StateMachineNode::StateMachineNode()
 	: Node("state_machine_node"), current_state_(State::INIT)
@@ -13,32 +17,47 @@ StateMachineNode::StateMachineNode()
     	"explore/status", 10,
       	std::bind(&StateMachineNode::explorationStatusCallback, this, std::placeholders::_1));
 
-
 	state_publisher_ = this->create_publisher<std_msgs::msg::String>("robot_current_state", 10);
-	
+
+    // Create a publisher for the /initialpose topic
+    initial_pose_publisher_ = this->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
+      "/initialpose", 10);
+
+	// Create the action client
+    docking_action_client_ = rclcpp_action::create_client<robot_interfaces::action::Docking>(this, "dock_robot");
+
+    if (!docking_action_client_->wait_for_action_server(std::chrono::seconds(10))) {
+	    RCLCPP_ERROR(this->get_logger(), "DockRobot action server not available.");
+    	return;
+    }
+
 	RCLCPP_INFO(this->get_logger(), "State Machine Initialized.");
 }
 
 void StateMachineNode::stateMachineLoop()
 {
-	switch (current_state_)
+	while(rclcpp::ok())
 	{
-		case State::INIT:
-			initCallback();
-			break;
-		case State::EXPLORATION:
-			explorationCallback();
-			break;
-		case State::DOCKING:
-			dockingCallback();
-			break;
-		case State::IDLE:
-			idleCallback();
-			break;
-		default:
-			RCLCPP_ERROR(this->get_logger(), "Unknown state.");
-			break;
+		switch (current_state_)
+		{
+			case State::INIT:
+				initCallback();
+				break;
+			case State::EXPLORATION:
+				explorationCallback();
+				break;
+			case State::DOCKING:
+				dockingCallback();
+				break;
+			case State::IDLE:
+				idleCallback();
+				break;
+			default:
+				RCLCPP_ERROR(this->get_logger(), "Unknown state.");
+				break;
+		}
 	}
+	return;
 }
 
 void StateMachineNode::changeState(State new_state)
@@ -79,21 +98,44 @@ void StateMachineNode::publishState(State state)
 	state_publisher_->publish(*message);
 }
 
+void StateMachineNode::publishInitialPose()
+{
+	geometry_msgs::msg::PoseWithCovarianceStamped msg;
+
+	// Set the header
+	msg.header.stamp = this->get_clock()->now();
+	msg.header.frame_id = "map";
+
+	// Set the pose
+	msg.pose.pose.position.x = 0.0;
+	msg.pose.pose.position.y = 0.0;
+	msg.pose.pose.position.z = 0.0;
+	msg.pose.pose.orientation.x = 0.0;
+	msg.pose.pose.orientation.y = 0.0;
+	msg.pose.pose.orientation.z = 0.0;
+	msg.pose.pose.orientation.w = 1.0;  // No rotation
+
+	RCLCPP_INFO(this->get_logger(), "Publishing initial pose: (0, 0, 0)");
+
+	initial_pose_publisher_->publish(msg);
+}
 
 void StateMachineNode::explorationStatusCallback(const std_msgs::msg::Bool::SharedPtr msg)
 {
 	is_exploration_completed_ = msg->data;
 }
 
+
 void StateMachineNode::initCallback()
 {
 	RCLCPP_INFO(this->get_logger(), "Executing Init State");
 
 	// Check if the map file exists
-	std::string map_file_path = "/home/ubuntu/turtlebot3_ws/src/turtlebot3_gazebo/maps/robot_house.yaml";
+	std::string map_file_path = "/home/ubuntu/turtlebot3_ws/src/turtlebot3_gazebo/maps/map_my_house.yaml";
 	if (mapFileExists(map_file_path))
 	{
 		RCLCPP_INFO(this->get_logger(), "Map file exists. Transitioning to Idle state.");
+		publishInitialPose();
 		changeState(State::IDLE);
 	}
 	else
@@ -120,8 +162,8 @@ void StateMachineNode::dockingCallback()
 
 void StateMachineNode::idleCallback()
 {
-	RCLCPP_INFO(this->get_logger(), "Executing Idle State");
-	changeState(State::EXPLORATION);
+	// RCLCPP_INFO(this->get_logger(), "Executing Idle State");
+	// changeState(State::EXPLORATION);
 }
 
 int main(int argc, char **argv)
