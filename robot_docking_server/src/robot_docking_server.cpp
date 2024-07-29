@@ -187,7 +187,7 @@ void DockingServerNode::execute_goal(
             break;
 
         case State::GO_TO_DOCK: 
-            if(x_offset_ <=0.05)
+            if(x_offset_ >= 1.2)
             {
                 RCLCPP_INFO(get_logger(), "Docking Completed");
                 publish_cmd_vel(0.0, 0.0);
@@ -223,13 +223,13 @@ bool DockingServerNode::send_nav2_goal()
     auto goal_msg = NavigateToPose::Goal();
     goal_msg.pose.header.stamp = this->now();
     goal_msg.pose.header.frame_id = "map";
-    goal_msg.pose.pose.position.x = -0.9876;
-    goal_msg.pose.pose.position.y = -0.2204;
+    goal_msg.pose.pose.position.x = 0.0;
+    goal_msg.pose.pose.position.y = -0.3;
 
     goal_msg.pose.pose.orientation.x = 0.0;
     goal_msg.pose.pose.orientation.y = 0.0;
-    goal_msg.pose.pose.orientation.z = 0.6255;
-    goal_msg.pose.pose.orientation.w = 0.7803;
+    goal_msg.pose.pose.orientation.z = 0.53;
+    goal_msg.pose.pose.orientation.w = 0.77;
 
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.result_callback = std::bind(&DockingServerNode::result_callback, this, _1);

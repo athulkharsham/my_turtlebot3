@@ -32,7 +32,7 @@ class DockingServerNode : public rclcpp::Node
 {
 public:
     DockingServerNode();
-    constexpr static float LINEAR_GAIN = 0.8f;
+    constexpr static float LINEAR_GAIN = 0.2f;
     constexpr static float ANGULAR_GAIN = 0.8f;
     
 private:
