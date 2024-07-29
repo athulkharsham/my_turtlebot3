@@ -2098,46 +2098,6 @@
       </link>
       <pose>-1.33164 -3.57546 0 0 -0 0</pose>
     </model>
-    <model name='suv'>
-      <static>1</static>
-      <link name='link'>
-        <collision name='collision'>
-          <pose>0 0 0 0 0 -1.5708</pose>
-          <geometry>
-            <mesh>
-              <scale>0.06 0.06 0.06</scale>
-              <uri>model://suv/meshes/suv.obj</uri>
-            </mesh>
-          </geometry>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='visual'>
-          <pose>0 0 0 0 0 -1.5708</pose>
-          <geometry>
-            <mesh>
-              <scale>0.06 0.06 0.06</scale>
-              <uri>model://suv/meshes/suv.obj</uri>
-            </mesh>
-          </geometry>
-        </visual>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <pose>3.93841 -4.80944 0 0 -0 0</pose>
-    </model>
     <model name='wooden_case'>
       <link name='base'>
         <pose>0 0 0.024 0 -0 0</pose>

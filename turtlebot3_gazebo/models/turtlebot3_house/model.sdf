@@ -4155,32 +4155,6 @@
         </surface>
       </collision>
     </link>
-    <model name='Mailbox'>
-      <link name='link'>
-        <collision name='collision'>
-          <geometry>
-            <mesh>
-              <uri>model://mailbox/meshes/mailbox.dae</uri>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='visual'>
-          <geometry>
-            <mesh>
-              <uri>model://mailbox/meshes/mailbox.dae</uri>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <uri>model://mailbox/materials/scripts</uri>
-              <uri>model://mailbox/materials/textures</uri>
-              <name>Mailbox/Diffuse</name>
-            </script>
-          </material>
-        </visual>
-      </link>
-      <pose frame=''>0.883462 -0.576236 0 0 0 -3.14159</pose>
-    </model>
     <model name='bookshelf'>
       <static>1</static>
       <link name='link'>
