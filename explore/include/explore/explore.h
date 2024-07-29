@@ -51,6 +51,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <string>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
@@ -107,6 +108,7 @@ private:
   void reachedGoal(const NavigationGoalHandle::WrappedResult& result,
                    const geometry_msgs::msg::Point& frontier_goal);
 
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr exploration_status_publisher_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
       marker_array_publisher_;
   rclcpp::Logger logger_ = rclcpp::get_logger("ExploreNode");
@@ -118,10 +120,14 @@ private:
       move_base_client_;
   frontier_exploration::FrontierSearch search_;
   rclcpp::TimerBase::SharedPtr exploring_timer_;
+  rclcpp::TimerBase::SharedPtr exploration_status_timer_;
   // rclcpp::TimerBase::SharedPtr oneshot_;
 
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr resume_subscription_;
   void resumeCallback(const std_msgs::msg::Bool::SharedPtr msg);
+
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr state_subscription_;
+  void stateCallback(const std_msgs::msg::String::SharedPtr msg);
 
   std::vector<geometry_msgs::msg::Point> frontier_blacklist_;
   geometry_msgs::msg::Point prev_goal_;
@@ -140,6 +146,8 @@ private:
   bool return_to_init_;
   std::string robot_base_frame_;
   bool resuming_ = false;
+  std::string robot_current_state_;
+  bool is_exploration_completed_;
 };
 }  // namespace explore
 

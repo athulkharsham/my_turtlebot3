@@ -96,11 +96,22 @@ Explore::Explore()
                                                                      "s",
                                                                      10);
   }
+  
+  is_exploration_completed_ = false;
+  // Create the exploration status publisher
+  exploration_status_publisher_ = this->create_publisher<std_msgs::msg::Bool>("explore/status", 10);
+
 
   // Subscription to resume or stop exploration
   resume_subscription_ = this->create_subscription<std_msgs::msg::Bool>(
       "explore/resume", 10,
       std::bind(&Explore::resumeCallback, this, std::placeholders::_1));
+
+  // Subscription to robot_current_state topic
+  state_subscription_ = this->create_subscription<std_msgs::msg::String>(
+      "robot_current_state", 10,
+      std::bind(&Explore::stateCallback, this, std::placeholders::_1));
+
 
   RCLCPP_INFO(logger_, "Waiting to connect to move_base nav2 server");
   move_base_client_->wait_for_action_server();
@@ -123,11 +134,29 @@ Explore::Explore()
     }
   }
 
+    // Create the timer to publish exploration status every 1 second
+  exploration_status_timer_ = this->create_wall_timer(
+      std::chrono::seconds(2),
+      [this]() { 
+          auto message = std_msgs::msg::Bool();
+          message.data = is_exploration_completed_;
+          exploration_status_publisher_->publish(message); 
+      });
+
   exploring_timer_ = this->create_wall_timer(
       std::chrono::milliseconds((uint16_t)(1000.0 / planner_frequency_)),
-      [this]() { makePlan(); });
+      [this]() { 
+        if (robot_current_state_ == "EXPLORATION") {
+          makePlan();
+        }
+      });
   // Start exploration right away
-  makePlan();
+  if (robot_current_state_ == "EXPLORATION") {
+    auto message = std_msgs::msg::Bool();
+    message.data = is_exploration_completed_;
+    exploration_status_publisher_->publish(message); 
+    makePlan(); 
+  }
 }
 
 Explore::~Explore()
@@ -234,6 +263,11 @@ void Explore::visualizeFrontiers(
 
   last_markers_count_ = current_markers_count;
   marker_array_publisher_->publish(markers_msg);
+}
+
+void Explore::stateCallback(const std_msgs::msg::String::SharedPtr msg)
+{
+  robot_current_state_ = msg->data;
 }
 
 void Explore::makePlan()
@@ -398,6 +432,10 @@ void Explore::stop(bool finished_exploring)
   RCLCPP_INFO(logger_, "Exploration stopped.");
   move_base_client_->async_cancel_all_goals();
   exploring_timer_->cancel();
+  is_exploration_completed_ = true;
+  auto message = std_msgs::msg::Bool();
+  message.data = is_exploration_completed_;
+  exploration_status_publisher_->publish(message);
 
   if (return_to_init_ && finished_exploring) {
     returnToInitialPose();
