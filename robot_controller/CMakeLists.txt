@@ -9,11 +9,14 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(robot_interfaces REQUIRED)
 
 include_directories(include)
 
 add_executable(robot_state_machine src/robot_state_machine.cpp)
-ament_target_dependencies(robot_state_machine rclcpp std_msgs)
+ament_target_dependencies(robot_state_machine rclcpp std_msgs geometry_msgs rclcpp_action robot_interfaces)
 
 install(
   DIRECTORY include
