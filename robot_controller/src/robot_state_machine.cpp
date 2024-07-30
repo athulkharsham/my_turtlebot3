@@ -32,6 +32,8 @@ StateMachineNode::StateMachineNode()
 
 void StateMachineNode::stateMachineLoop()
 {
+	// RCLCPP_INFO(get_logger(), "Current state: %d", current_state_);
+    publishState(current_state_);
 	switch (current_state_)
 	{
 		case State::INIT:
