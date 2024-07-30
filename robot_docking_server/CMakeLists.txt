@@ -28,6 +28,11 @@ install(
   DESTINATION include
 )
 
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
 install(TARGETS
   robot_docking_server
   robot_pose_publisher
