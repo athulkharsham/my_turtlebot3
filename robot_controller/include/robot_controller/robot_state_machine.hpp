@@ -10,6 +10,9 @@
 #include <memory>
 #include <fstream>
 
+using namespace std::placeholders;
+
+
 class StateMachineNode : public rclcpp::Node
 {
 public:
@@ -36,14 +39,18 @@ private:
     void dockingCallback();
     void idleCallback();
 	void publishInitialPose();
+    void sendDockingGoal();
 
     rclcpp::TimerBase::SharedPtr state_machine_timer_;
 	rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr exploration_status_subscription_;
 	rclcpp::Publisher<std_msgs::msg::String>::SharedPtr state_publisher_;
 	rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr initial_pose_publisher_;
 	rclcpp_action::Client<robot_interfaces::action::Docking>::SharedPtr docking_action_client_;
+    void resultCallback(const rclcpp_action::ClientGoalHandle<robot_interfaces::action::Docking>::WrappedResult &result);
     State current_state_;
 	bool is_exploration_completed_  = false;
+    bool is_docking_completed_ = false;
+    bool is_docking_goal_sent_ = false;
 };
 
 #endif  // ROBOT_STATEMACHINE_HPP

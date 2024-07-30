@@ -99,7 +99,7 @@ Explore::Explore()
   
   is_exploration_completed_ = false;
   // Create the exploration status publisher
-  exploration_status_publisher_ = this->create_publisher<std_msgs::msg::Bool>("explore/status", 10);
+  exploration_status_publisher_ = this->create_publisher<std_msgs::msg::Bool>("/explore/status", 10);
 
 
   // Subscription to resume or stop exploration
