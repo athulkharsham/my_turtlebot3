@@ -167,8 +167,8 @@ void DockingServerNode::execute_goal(
             break;
 
         case State::LINEAR_MOVEMENT:
-            publish_cmd_vel(0.02, 0.0);
-            if(y_offset_ <= 0.03)
+            publish_cmd_vel(0.03, 0.0);
+            if(y_offset_ <= 0.02)
             {   
                 RCLCPP_INFO(get_logger(), "Angular Movement Started");
                 publish_cmd_vel(0.0, 0.0);
@@ -177,7 +177,7 @@ void DockingServerNode::execute_goal(
             break;
 
         case State::ANGULAR_MOVEMENT:
-            publish_cmd_vel(0.0, -0.05);
+            publish_cmd_vel(0.0, -0.08);
             if(theta_offset_ <= 0.02)
             {
                 RCLCPP_INFO(get_logger(), "Final Docking Started");
@@ -187,7 +187,7 @@ void DockingServerNode::execute_goal(
             break;
 
         case State::GO_TO_DOCK: 
-            if(x_offset_ >= 1.2)
+            if(x_offset_ >= 1.0)
             {
                 RCLCPP_INFO(get_logger(), "Docking Completed");
                 publish_cmd_vel(0.0, 0.0);
@@ -223,8 +223,8 @@ bool DockingServerNode::send_nav2_goal()
     auto goal_msg = NavigateToPose::Goal();
     goal_msg.pose.header.stamp = this->now();
     goal_msg.pose.header.frame_id = "map";
-    goal_msg.pose.pose.position.x = 0.0;
-    goal_msg.pose.pose.position.y = -0.3;
+    goal_msg.pose.pose.position.x = -0.15;
+    goal_msg.pose.pose.position.y = -0.21;
 
     goal_msg.pose.pose.orientation.x = 0.0;
     goal_msg.pose.pose.orientation.y = 0.0;
@@ -314,8 +314,8 @@ void DockingServerNode::aruco_pose_callback(const geometry_msgs::msg::PoseArray 
         mat.getRPY(roll, pitch, yaw);
 
         // Calculate position errors
-        double desired_x = 0.001; 
-        double desired_y = 0.001;
+        double desired_x = 0.0001; 
+        double desired_y = 0.0001;
         double current_x = transform.getOrigin().x();
         double current_y = transform.getOrigin().y();
         double error_x = desired_x - current_x;

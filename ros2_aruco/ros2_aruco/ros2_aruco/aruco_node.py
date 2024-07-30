@@ -191,6 +191,12 @@ class ArucoNode(rclpy.node.Node):
                 rvecs, tvecs = cv2.aruco.estimatePoseSingleMarkers(
                     corners, self.marker_size, self.intrinsic_mat, self.distortion
                 )
+            # Rotation matrix for 180 degrees about the x-axis
+            rot_x_180 = np.array([
+                [1, 0, 0],
+                [0, -1, 0],
+                [0, 0, -1]
+            ])
             for i, marker_id in enumerate(marker_ids):
                 pose = Pose()
                 pose.position.x = tvecs[i][0][0]
@@ -199,6 +205,8 @@ class ArucoNode(rclpy.node.Node):
 
                 rot_matrix = np.eye(4)
                 rot_matrix[0:3, 0:3] = cv2.Rodrigues(np.array(rvecs[i][0]))[0]
+                # Apply counter-rotation (180 degrees about x-axis)
+                rot_matrix[0:3, 0:3] = np.dot(rot_x_180, rot_matrix[0:3, 0:3])
                 quat = tf_transformations.quaternion_from_matrix(rot_matrix)
 
                 pose.orientation.x = quat[0]
