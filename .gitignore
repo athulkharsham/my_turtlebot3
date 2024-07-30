@@ -128,4 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+#vscode
 .vscode
+
+#maps
+*.pgm
+*.yaml
