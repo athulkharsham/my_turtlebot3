@@ -64,6 +64,22 @@ bool StateMachineNode::mapFileExists(const std::string &file_path)
   return file.good();
 }
 
+void StateMachineNode::saveMap(const std::string & map_name)
+{
+    // Build the command to save the map
+    std::string command = "ros2 run nav2_map_server map_saver_cli -f " + map_name;
+
+    // Execute the command
+    int result = std::system(command.c_str());
+
+    // Check if the command was successful
+    if (result == 0) {
+        RCLCPP_INFO(this->get_logger(), "Map saved successfully at %s.", map_name.c_str());
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to save map.");
+    }
+}
+
 void StateMachineNode::publishState(State state)
 {
 	auto message = std::make_shared<std_msgs::msg::String>();
@@ -177,6 +193,7 @@ void StateMachineNode::explorationCallback()
 	// RCLCPP_INFO(this->get_logger(), "Exploration status %d", (int)is_exploration_completed_);
 	if(is_exploration_completed_)
 	{
+        saveMap("/home/ubuntu/turtlebot3_ws/src/turtlebot3_gazebo/maps/robot_house");
 		changeState(State::DOCKING);
 	}
 }

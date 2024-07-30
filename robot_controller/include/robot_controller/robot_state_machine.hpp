@@ -40,6 +40,7 @@ private:
     void idleCallback();
 	void publishInitialPose();
     void sendDockingGoal();
+    void saveMap(const std::string & map_name);
 
     rclcpp::TimerBase::SharedPtr state_machine_timer_;
 	rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr exploration_status_subscription_;
