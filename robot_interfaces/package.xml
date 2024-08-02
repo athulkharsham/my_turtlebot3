@@ -7,7 +7,10 @@
   <maintainer email="athulkharsham@gmail.com">ubuntu</maintainer>
   <license>TODO: License declaration</license>
 
+
+  <depend>std_msgs</depend>
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>std_msgs</buildtool_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
