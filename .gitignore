@@ -133,4 +133,3 @@ dmypy.json
 
 #maps
 *.pgm
-*.yaml

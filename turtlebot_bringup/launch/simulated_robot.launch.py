@@ -18,6 +18,14 @@ def generate_launch_description():
         ),
     )
     
+    stateMachine = IncludeLaunchDescription(
+        os.path.join(
+            get_package_share_directory("robot_controller"),
+            "launch",
+            "robot_state_machine.launch.py"
+        ),
+    )
+
     docking = IncludeLaunchDescription(
         os.path.join(
             get_package_share_directory("robot_docking_server"),
@@ -47,10 +55,11 @@ def generate_launch_description():
     )
     return LaunchDescription([
         gazebo,
+        stateMachine,
         docking,
         visualization,
         TimerAction(
-            period=3.0,
+            period=10.0,
             actions=[aruco]
         ),
     ])
