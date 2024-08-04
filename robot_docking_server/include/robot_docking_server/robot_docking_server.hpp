@@ -33,7 +33,7 @@ class DockingServerNode : public rclcpp::Node
 public:
     DockingServerNode();
     constexpr static float LINEAR_GAIN = 0.8f;
-    constexpr static float ANGULAR_GAIN = 0.8f;
+    constexpr static float ANGULAR_GAIN = -0.8f;
     
 private:
     /*Methods*/
@@ -49,7 +49,7 @@ private:
     void execute_goal(
         const std::shared_ptr<DockingGoalHandle> goal_handle);
     
-    bool send_nav2_goal();
+    bool send_nav2_goal(int sign);
 
     void result_callback(const rclcpp_action::ClientGoalHandle<NavigateToPose>::WrappedResult &result);
 
@@ -59,7 +59,7 @@ private:
 
     void aruco_pose_callback(const geometry_msgs::msg::PoseArray &msg);
 
-    void docking_controller(geometry_msgs::msg::Twist &vel_msg, double error_x, double error_y, double yaw);
+    void docking_controller(geometry_msgs::msg::Twist &vel_msg, double yaw);
 
     /*Attributes*/
     rclcpp_action::Server<Docking>::SharedPtr robot_docking_server_;

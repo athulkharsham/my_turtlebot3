@@ -110,7 +110,7 @@ void DockingServerNode::execute_goal(
             if (goal_handle->is_canceling()) 
             {
                 result->docking_completed = is_docking_completed_;
-                if(y_offset_ == 0.01)
+                if(abs(y_offset_) <= 0.001 && abs(theta_offset_) <=0.001)
                 {
                     result->message = "success";
                     goal_handle->succeed(result);
@@ -147,13 +147,23 @@ void DockingServerNode::execute_goal(
         {
         case State::INIT_DOCKING:
             RCLCPP_INFO(get_logger(), "Init Docking");
-            x_offset_ = 0.0;
-            y_offset_ = 0.0;
-            theta_offset_ = 0.0;
-            if(send_nav2_goal())
+            if(y_offset_ < 0)
             {
-                RCLCPP_INFO(get_logger(), "Go to Prepose");
-                state_ = State::MOVE_TO_PREPOSE;
+                //left to the x axis
+                if(send_nav2_goal(-1))
+                {
+                    RCLCPP_INFO(get_logger(), "Go to Prepose");
+                    state_ = State::MOVE_TO_PREPOSE;
+                }
+            }
+            else
+            {
+                //right to the x axis
+                if(send_nav2_goal(1))
+                {
+                    RCLCPP_INFO(get_logger(), "Go to Prepose");
+                    state_ = State::MOVE_TO_PREPOSE;
+                }
             }
             break;
 
@@ -168,7 +178,7 @@ void DockingServerNode::execute_goal(
 
         case State::LINEAR_MOVEMENT:
             publish_cmd_vel(0.03, 0.0);
-            if(y_offset_ <= 0.02)
+            if(abs(y_offset_) <= 0.02)
             {   
                 RCLCPP_INFO(get_logger(), "Angular Movement Started");
                 publish_cmd_vel(0.0, 0.0);
@@ -177,8 +187,17 @@ void DockingServerNode::execute_goal(
             break;
 
         case State::ANGULAR_MOVEMENT:
-            publish_cmd_vel(0.0, -0.08);
-            if(theta_offset_ <= 0.02)
+            RCLCPP_INFO(get_logger(), "y_offset_ : %f, theta_offset_: %f", y_offset_, theta_offset_);
+            if(theta_offset_ > 0)
+            {
+                publish_cmd_vel(0.0, -0.08);
+            }
+            else
+            {
+                publish_cmd_vel(0.0, 0.08);
+            }
+
+            if(abs(theta_offset_) <= 0.02)
             {
                 RCLCPP_INFO(get_logger(), "Final Docking Started");
                 publish_cmd_vel(0.0, 0.0);
@@ -186,8 +205,8 @@ void DockingServerNode::execute_goal(
             }
             break;
 
-        case State::GO_TO_DOCK: 
-            if(x_offset_ >= 1.0)
+        case State::GO_TO_DOCK:
+            if(x_offset_ >= 1.07)
             {
                 RCLCPP_INFO(get_logger(), "Docking Completed");
                 publish_cmd_vel(0.0, 0.0);
@@ -213,7 +232,7 @@ void DockingServerNode::execute_goal(
 }
 
 
-bool DockingServerNode::send_nav2_goal()
+bool DockingServerNode::send_nav2_goal(int sign)
 {
     if (!nav2_action_client_->wait_for_action_server(std::chrono::seconds(5))) {
         RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
@@ -224,11 +243,11 @@ bool DockingServerNode::send_nav2_goal()
     goal_msg.pose.header.stamp = this->now();
     goal_msg.pose.header.frame_id = "map";
     goal_msg.pose.pose.position.x = -0.15;
-    goal_msg.pose.pose.position.y = -0.21;
+    goal_msg.pose.pose.position.y = sign * 0.21;
 
     goal_msg.pose.pose.orientation.x = 0.0;
     goal_msg.pose.pose.orientation.y = 0.0;
-    goal_msg.pose.pose.orientation.z = 0.53;
+    goal_msg.pose.pose.orientation.z = (sign * -1 ) * 0.53;
     goal_msg.pose.pose.orientation.w = 0.77;
 
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
@@ -277,10 +296,9 @@ void DockingServerNode::timer_callback()
             tf2::TimePointZero // Time (latest available)
         );
 
-
         // Extract translation and rotation
         x_offset_ = abs(transform.transform.translation.x);
-        y_offset_ = abs(transform.transform.translation.y);
+        y_offset_ = transform.transform.translation.y;
 
         double roll, pitch, yaw;
 
@@ -293,6 +311,7 @@ void DockingServerNode::timer_callback()
         tf2::Matrix3x3 m(q);
         m.getRPY(roll, pitch, yaw);
         theta_offset_ = yaw;
+        RCLCPP_INFO(this->get_logger(), "Robot Yaw: %f", theta_offset_);
     }
     catch (const tf2::TransformException &ex)
     {
@@ -316,38 +335,40 @@ void DockingServerNode::aruco_pose_callback(const geometry_msgs::msg::PoseArray 
         // Calculate position errors
         double desired_x = 0.0001; 
         double desired_y = 0.0001;
+        double desired_yaw = 0.00001;
         double current_x = transform.getOrigin().x();
         double current_y = transform.getOrigin().y();
+        double current_yaw = yaw;
         double error_x = desired_x - current_x;
         double error_y = desired_y - current_y;
-
+        double error_yaw = desired_yaw - current_yaw;
+        // RCLCPP_INFO(this->get_logger(), "Aruco Yaw: %f", current_x);
         geometry_msgs::msg::Twist vel_msg;
         if (DockingServerNode::state_ == State::GO_TO_DOCK)
         {
-            RCLCPP_INFO(this->get_logger(), "Yaw angle: %f", yaw);
-            RCLCPP_INFO(this->get_logger(), "Position Error - X: %f, Y: %f", error_x, error_y);
-            DockingServerNode::docking_controller(vel_msg, error_x, error_y, yaw);
+            // RCLCPP_INFO(this->get_logger(), "Errors - Yaw: %f", current_x);
+            DockingServerNode::docking_controller(vel_msg, current_x);
             DockingServerNode::cmd_vel_publisher_->publish(vel_msg);
         }
     }
 }
 
-void DockingServerNode::docking_controller(geometry_msgs::msg::Twist &vel_msg, double error_x, double error_y, double yaw)
+void DockingServerNode::docking_controller(geometry_msgs::msg::Twist &vel_msg, double yaw)
 {
-    double distance = sqrt(error_x * error_x + error_y * error_y);
-    vel_msg.linear.x = DockingServerNode::LINEAR_GAIN * distance;
-    vel_msg.angular.z = DockingServerNode::ANGULAR_GAIN * yaw;
-    const double position_threshold = 0.0;
-    const double angle_threshold = 0.0;
+    
+    const double angle_threshold = 0.005;
 
-    if (distance < position_threshold)
-    {
-        vel_msg.linear.x = 0.0; 
-    }
-    if (std::abs(yaw) < angle_threshold)
+    if (std::abs(yaw) <= angle_threshold)
     {
         vel_msg.angular.z = 0.0;
+        vel_msg.linear.x = 0.06;
     }
+    else
+    {
+        vel_msg.linear.x = 0.0;
+        vel_msg.angular.z = DockingServerNode::ANGULAR_GAIN * (yaw);
+    }
+    // RCLCPP_INFO(this->get_logger(), "Cmd_vel - Yaw: %f", vel_msg.angular.z);
 }
 
 
