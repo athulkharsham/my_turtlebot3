@@ -32,9 +32,10 @@ void Tracker::_yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg)
 
   for(long unsigned int i = 0 ; i < msg.yolov8_inference.size(); i++)
   {
-    if(msg.yolov8_inference[i].class_name == "cat" || 
-      msg.yolov8_inference[i].class_name == "dog"  ||
-      msg.yolov8_inference[i].class_name == "horse")
+    if(msg.yolov8_inference[i].class_name == "cat"  || 
+      msg.yolov8_inference[i].class_name == "dog"   ||
+      msg.yolov8_inference[i].class_name == "horse" ||
+      msg.yolov8_inference[i].class_name == "person")
     {
       auto top = msg.yolov8_inference[0].top;
       auto left = msg.yolov8_inference[0].left;
@@ -51,9 +52,9 @@ void Tracker::_yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg)
 void Tracker::_scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
   double distance =0;
-  for(int i=0; i < 5; i++)
+  for(int i=0; i < 10; i++)
   {
-    if(msg->ranges[i] < 4.0 && msg->ranges[i] > 0.15)
+    if(msg->ranges[i] < 10.0)
     {
       distance += msg->ranges[i];
     }
@@ -80,6 +81,8 @@ void Tracker::_designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj
   int px_to_center = img_width / 2 - obj_x_center;
   float ang_vel = ANGULAR_GAIN * px_to_center / static_cast<float>(img_width);
 
+  const double fixed_distance = 1.0;
+
   RCLCPP_INFO(get_logger(), "obj_x_center = %d px_to_center= %d Ang_vel = %f", obj_x_center, px_to_center, ang_vel);
 
   // Ensure angular velocity is within bounds
@@ -89,7 +92,7 @@ void Tracker::_designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj
   }
   if(_center_distance > 1.2 && _center_distance!= 0.0)
   {
-    vel_msg.linear.x = 0.15;
+    vel_msg.linear.x = (_center_distance - fixed_distance) * 1.1;
   }
 }
 
