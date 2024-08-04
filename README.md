@@ -80,3 +80,35 @@ ros2 launch explore_lite explore.launch.py
 ```sh
 ros2 topic pub /explore/resume std_msgs/msg/Bool "data: true"
 ```
+## Tracker
+Follow person, pet using yolov8 and cv2
+
+To begin with
+
+1. Start the human world with turtlebot3
+```sh
+ros2 launch turtlebot3_gazebo empty_world.launch.py
+```
+2. Start yolov8 with tracker
+```sh
+ros2 launch yolobot_recognition launch_yolov8.launch.py
+```
+3. Start Per tracker node
+```sh
+ros2 run pet_tracker pet_tracker
+```
+4. Start RVIZ2
+```sh
+rviz2
+```
+4. To move person in gazebo
+```sh
+ros2 topic pub /demo/cmd_demo geometry_msgs/msg/Twist "linear:
+  x: 0.0
+  y: -0.15
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 0.0"
+```
