@@ -42,7 +42,7 @@
         <geometry>
           <mesh>
             <uri>model://charging_dock/meshes/Marker0.dae</uri>
-	          <scale>0.1 0.1 0.1</scale>
+	          <scale>0.05 0.05 0.05</scale>
           </mesh>
         </geometry>
       </visual>

@@ -48,7 +48,7 @@ class ArucoNode(rclpy.node.Node):
         # Declare and read parameters
         self.declare_parameter(
             name="marker_size",
-            value=0.10,
+            value=0.05,
             descriptor=ParameterDescriptor(
                 type=ParameterType.PARAMETER_DOUBLE,
                 description="Size of the markers in meters.",
@@ -182,7 +182,7 @@ class ArucoNode(rclpy.node.Node):
         corners, marker_ids, rejected = self.detector.detectMarkers(cv_image)
 
         if marker_ids is not None:
-            self.get_logger().info(f"Markers detected: {marker_ids}")
+            # self.get_logger().info(f"Markers detected: {marker_ids}")
             if cv2.__version__ > "4.0.0":
                 rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
                     corners, self.marker_size, self.intrinsic_mat, self.distortion
@@ -206,7 +206,7 @@ class ArucoNode(rclpy.node.Node):
                 rot_matrix = np.eye(4)
                 rot_matrix[0:3, 0:3] = cv2.Rodrigues(np.array(rvecs[i][0]))[0]
                 # Apply counter-rotation (180 degrees about x-axis)
-                rot_matrix[0:3, 0:3] = np.dot(rot_x_180, rot_matrix[0:3, 0:3])
+                # rot_matrix[0:3, 0:3] = np.dot(rot_x_180, rot_matrix[0:3, 0:3])
                 quat = tf_transformations.quaternion_from_matrix(rot_matrix)
 
                 pose.orientation.x = quat[0]
@@ -220,8 +220,8 @@ class ArucoNode(rclpy.node.Node):
 
             self.poses_pub.publish(pose_array)
             self.markers_pub.publish(markers)
-        else:
-            self.get_logger().warn("No markers detected in the camera image")
+        # else:
+        #     self.get_logger().warn("No markers detected in the camera image")
 
 def main():
     rclpy.init()
