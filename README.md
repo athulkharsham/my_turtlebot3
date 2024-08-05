@@ -4,17 +4,13 @@ Autonomous exploration, navigation and docking of turtlebot3 in gazebo simulatio
 <!-- USAGE -->
 
 ## Usage New : with new bringup method
-1. Start the robot stack
+
+We can now start the robot with one script.
+If no map then it automatically explores the environment, creates the map, saves it and goes to dock.
+If map exists robot will load the map and will be ready for navigation
+#### Run the script
 ```sh
-ros2 launch turtlebot_bringup simulated_robot.launch.py
-```
-2. Start Navigation and chose the rviz file from rviz directory in the package
-```sh
-ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=src/turtlebot3_gazebo/maps/map_my_house.yaml
-```
-3. Initialize AMCL position with robot initial pose
-```sh
-ros2 run robot_controller robot_state_machine
+./src/robot_controller/script/start_simulation.sh
 ```
 
 ## Usage Old : with most of the ros2 run to check most of the node independently
@@ -85,7 +81,7 @@ Follow person, pet using yolov8 and cv2
 
 To begin with
 
-1. Start the human world with turtlebot3
+1. Start the empty world with turtlebot3
 ```sh
 ros2 launch turtlebot3_gazebo empty_world.launch.py
 ```
