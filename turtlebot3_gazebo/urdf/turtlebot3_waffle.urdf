@@ -276,7 +276,7 @@
   <link name="camera_rgb_optical_frame"/>
 
   <joint name="camera_depth_joint" type="fixed">
-    <origin xyz="0.005 0.028 0.013" rpy="0 0 0"/>
+    <origin xyz="0.0 0.0 0.0" rpy="1.5708 -3.14 1.5708"/>
     <!-- <origin xyz="${r200_cam_rgb_px} ${r200_cam_rgb_py + r200_cam_depth_offset} ${r200_cam_rgb_pz}" rpy="0 0 0"/> -->
     <parent link="camera_link"/>
     <child link="camera_depth_frame"/>
