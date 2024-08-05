@@ -129,11 +129,11 @@ class ArucoNode(rclpy.node.Node):
 
         # Set up subscriptions
         self.info_sub = self.create_subscription(
-            CameraInfo, info_topic, self.info_callback, qos_profile_sensor_data
+            CameraInfo, info_topic, self.info_callback, 10
         )
 
         self.create_subscription(
-            Image, image_topic, self.image_callback, qos_profile_sensor_data
+            Image, image_topic, self.image_callback, 10
         )
 
         # Set up publishers

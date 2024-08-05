@@ -311,7 +311,6 @@ void DockingServerNode::timer_callback()
         tf2::Matrix3x3 m(q);
         m.getRPY(roll, pitch, yaw);
         theta_offset_ = yaw;
-        RCLCPP_INFO(this->get_logger(), "Robot Yaw: %f", theta_offset_);
     }
     catch (const tf2::TransformException &ex)
     {
