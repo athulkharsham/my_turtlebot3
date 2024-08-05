@@ -18,18 +18,21 @@ public:
 
 private:
   void _imageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
-  void _initTracker(cv::Mat frame, cv::Rect obj);
   void _designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj, uint32_t img_width);
   void _scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
   void _yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg);
+  void _depthImageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
 
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr _img_sub;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr _visualization_pub;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _vel_pub;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr _scan_sub;
   rclcpp::Subscription<yolov8_msgs::msg::Yolov8Inference>::SharedPtr _yolo_sub;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr _depth_image_subscriber;
+
   cv::Ptr<cv::Tracker> _tracker;
   bool _is_tracker_initialized;
-  double _center_distance;
+  float _center_distance;
+  int _center_x, _center_y;
   int _image_width;
 };
