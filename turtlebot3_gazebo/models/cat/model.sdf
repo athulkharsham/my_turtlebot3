@@ -18,7 +18,7 @@
         </inertia>
       </inertial>
       <collision name="bottom">
-        <pose>0 -0.0 0.01 0 0 0</pose>
+        <pose>0 -0.0 0.01 0 0 -1.57</pose>
         <geometry>
           <box>
             <size>0.18 0.10 0.03</size>
@@ -26,7 +26,7 @@
         </geometry>
       </collision>
       <collision name="cat">
-        <pose>0 0 -0.02 0 0 -1.54</pose>
+        <pose>0 0 -0.02 0 0 0.0</pose>
         <geometry>
           <mesh>
             <uri>model://cat/meshes/cat/12221_Cat_v1_l3.obj</uri>
@@ -36,7 +36,7 @@
       </collision>
 
       <visual name="cat">
-        <pose>0 0 -0.02 0 0 -1.54</pose>
+        <pose>0 0 -0.02 0 0 0.0</pose>
         <geometry>
           <mesh>
             <uri>model://cat/meshes/cat/12221_Cat_v1_l3.obj</uri>
