@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <KeepRunningUntilFailure>
+            <Sequence>
+                <Fallback>
+                    <Inverter>
+                        <Action ID="GetWaypoint" waypoint="{wp}" wp_id="next"/>
+                    </Inverter>
+                    <Inverter>
+                        <Action ID="Move" goal="{wp}"/>
+                    </Inverter>
+                    <Action ID="Patrol"/>
+                </Fallback>
+                <Action ID="Follow"/>
+            </Sequence>
+        </KeepRunningUntilFailure>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="BatteryChecker"/>
+        <Condition ID="Check"/>
+        <Action ID="Follow"/>
+        <Action ID="GetWaypoint">
+            <output_port name="waypoint"/>
+            <input_port name="wp_id"/>
+        </Action>
+        <Action ID="Move">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="Patrol"/>
+        <Action ID="Recharge"/>
+        <Action ID="TrackObjects"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
