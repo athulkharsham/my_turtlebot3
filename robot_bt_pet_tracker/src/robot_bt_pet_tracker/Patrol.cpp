@@ -33,17 +33,13 @@ void Patrol::yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg)
 {
   for(long unsigned int i = 0 ; i < msg.yolov8_inference.size(); i++)
   {
-    if(msg.yolov8_inference[i].class_name == "cat"  || 
-      msg.yolov8_inference[i].class_name == "dog"   ||
-      msg.yolov8_inference[i].class_name == "horse" ||
-      msg.yolov8_inference[i].class_name == "person")
+    if(msg.yolov8_inference[i].class_name == "cat"|| 
+      msg.yolov8_inference[i].class_name == "dog")
     {
       is_pet_found_ = true;
+      return;
     }
-    else
-    {
-      is_pet_found_ = false;
-    }
+    is_pet_found_ = false;
   }
 }
 

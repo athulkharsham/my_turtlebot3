@@ -28,7 +28,7 @@ Follow::Follow(
   yolo_sub_ = node_->create_subscription<yolov8_msgs::msg::Yolov8Inference>("/Yolov8_Inference",
     10, bind(&Follow::yoloCallback, this, _1));
   depth_image_sub_ = node_->create_subscription<sensor_msgs::msg::Image>(
-    "/depth_camera/depth/image_raw", rclcpp::SensorDataQoS(),
+    "/depth_camera/depth/image_raw", 10,
     std::bind(&Follow::depthImageCallback, this, _1));
 }
 
@@ -38,10 +38,8 @@ void Follow::yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg)
 
   for(long unsigned int i = 0 ; i < msg.yolov8_inference.size(); i++)
   {
-    if(msg.yolov8_inference[i].class_name == "cat"  || 
-      msg.yolov8_inference[i].class_name == "dog"   ||
-      msg.yolov8_inference[i].class_name == "horse" ||
-      msg.yolov8_inference[i].class_name == "person")
+    if(msg.yolov8_inference[i].class_name == "cat"|| 
+      msg.yolov8_inference[i].class_name == "dog")
     {
       auto top = msg.yolov8_inference[0].top;
       auto left = msg.yolov8_inference[0].left;
@@ -63,19 +61,17 @@ void Follow::yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg)
 void Follow::depthImageCallback(const sensor_msgs::msg::Image::SharedPtr msg)
 {
   cv::Mat depth_image = cv_bridge::toCvShare(msg, "32FC1")->image;
+  if(center_y_!=0 && center_x_!=0)
   {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if(center_y_!=0 && center_x_!=0)
+    float depth_value = depth_image.at<float>(center_y_, center_x_);
+    if(depth_value < 5.0)
     {
-      float depth_value = depth_image.at<float>(center_y_, center_x_);
-      if(depth_value < 5.0)
-      {
-        center_distance_ = depth_value;
-      }
-      else
-      {
-        depth_value = 0.0;
-      }
+      center_distance_ = depth_value;
+    }
+    else
+    {
+      depth_value = 0.0;
+      center_distance_ = depth_value;
     }
   }
 }
@@ -95,7 +91,7 @@ void Follow::designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj, 
   }
   if(center_distance_ > 0.8 && center_distance_!= 0.0)
   {
-    vel_msg.linear.x = (center_distance_ - FIXED_DISTANCE) * 0.9;
+    vel_msg.linear.x = (center_distance_ - FIXED_DISTANCE) * 0.65;
   }
 }
 
