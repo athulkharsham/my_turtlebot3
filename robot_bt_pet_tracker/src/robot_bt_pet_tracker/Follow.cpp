@@ -26,7 +26,7 @@ Follow::Follow(
 
   vel_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", rclcpp::SystemDefaultsQoS());
   yolo_sub_ = node_->create_subscription<yolov8_msgs::msg::Yolov8Inference>("/Yolov8_Inference",
-    10, bind(&Follow::yoloCallback_, this, _1));
+    10, bind(&Follow::yoloCallback, this, _1));
   depth_image_sub_ = node_->create_subscription<sensor_msgs::msg::Image>(
     "/depth_camera/depth/image_raw", rclcpp::SensorDataQoS(),
     std::bind(&Follow::depthImageCallback, this, _1));
