@@ -13,7 +13,6 @@ namespace robot_bt_pet_tracker
 {
 
 using namespace std::chrono_literals;
-using namespace std::placeholders;
 
 Patrol::Patrol(
   const std::string & xml_tag_name,
@@ -22,25 +21,7 @@ Patrol::Patrol(
 {
   config().blackboard->get("node", node_);
 
-  vel_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 100);
-
-  yolo_sub_ = node_->create_subscription<yolov8_msgs::msg::Yolov8Inference>("/Yolov8_Inference",
-    10, bind(&Patrol::yoloCallback, this, _1));
-
-}
-
-void Patrol::yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg)
-{
-  for(long unsigned int i = 0 ; i < msg.yolov8_inference.size(); i++)
-  {
-    if(msg.yolov8_inference[i].class_name == "cat"|| 
-      msg.yolov8_inference[i].class_name == "dog")
-    {
-      is_pet_found_ = true;
-      return;
-    }
-    is_pet_found_ = false;
-  }
+  vel_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
 }
 
 void
@@ -62,16 +43,11 @@ Patrol::tick()
 
   auto elapsed = node_->now() - start_time_;
 
-  if (elapsed < 15s) 
-  {
-    if(is_pet_found_)
-    {
-      RCLCPP_INFO(node_->get_logger(), "Pet Found!!");
-      return BT::NodeStatus::SUCCESS;
-    }
+  if (elapsed < 15s) {
     return BT::NodeStatus::RUNNING;
-  } 
-  return BT::NodeStatus::FAILURE;
+  } else {
+    return BT::NodeStatus::FAILURE;
+  }
 }
 
 }  // namespace robot_bt_pet_tracker

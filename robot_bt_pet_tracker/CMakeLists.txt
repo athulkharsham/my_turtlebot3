@@ -50,8 +50,11 @@ add_library(robot_patrol_bt_node SHARED src/robot_bt_pet_tracker/Patrol.cpp)
 add_library(robot_move_bt_node SHARED src/robot_bt_pet_tracker/Move.cpp)
 add_library(robot_get_waypoint_bt_node SHARED src/robot_bt_pet_tracker/GetWaypoint.cpp)
 add_library(robot_follow_bt_node SHARED src/robot_bt_pet_tracker/Follow.cpp)
+add_library(robot_find_pet_bt_node SHARED src/robot_bt_pet_tracker/FindPet.cpp)
+
 list(APPEND plugin_libs
   robot_patrol_bt_node
+  robot_find_pet_bt_node
   robot_move_bt_node
   robot_get_waypoint_bt_node
   robot_follow_bt_node

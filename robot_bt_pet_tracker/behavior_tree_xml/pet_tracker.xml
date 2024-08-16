@@ -11,7 +11,10 @@
                     <Inverter>
                         <Action ID="Move" goal="{wp}"/>
                     </Inverter>
-                    <Action ID="Patrol"/>
+                    <Parallel failure_threshold="1" success_threshold="1">
+                        <Action ID="Patrol"/>
+                        <Action ID="FindPet"/>
+                    </Parallel>
                 </Fallback>
                 <Action ID="Follow"/>
             </Sequence>
@@ -19,8 +22,7 @@
     </BehaviorTree>
     <!-- ////////// -->
     <TreeNodesModel>
-        <Action ID="BatteryChecker"/>
-        <Condition ID="Check"/>
+        <Action ID="FindPet"/>
         <Action ID="Follow"/>
         <Action ID="GetWaypoint">
             <output_port name="waypoint"/>
@@ -30,8 +32,6 @@
             <input_port name="goal"/>
         </Action>
         <Action ID="Patrol"/>
-        <Action ID="Recharge"/>
-        <Action ID="TrackObjects"/>
     </TreeNodesModel>
     <!-- ////////// -->
 </root>

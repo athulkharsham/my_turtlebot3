@@ -1,5 +1,5 @@
-#ifndef ROBOT_BT_PETTRACKER_PATROL_HPP_
-#define ROBOT_BT_PETTRACKER_PATROL_HPP_
+#ifndef ROBOT_BT_PETTRACKER_FINDPET_HPP_
+#define ROBOT_BT_PETTRACKER_FINDPET_HPP_
 
 #include <string>
 
@@ -14,10 +14,10 @@
 namespace robot_bt_pet_tracker
 {
 
-class Patrol : public BT::ActionNodeBase
+class FindPet : public BT::ActionNodeBase
 {
 public:
-  explicit Patrol(
+  explicit FindPet(
     const std::string & xml_tag_name,
     const BT::NodeConfiguration & conf);
 
@@ -29,12 +29,15 @@ public:
     return BT::PortsList({});
   }
 
+  void yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg);
+
 private:
   rclcpp::Node::SharedPtr node_;
-  rclcpp::Time start_time_;
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr vel_pub_;
+  rclcpp::Subscription<yolov8_msgs::msg::Yolov8Inference>::SharedPtr yolo_sub_;
+  yolov8_msgs::msg::Yolov8Inference last_inference_msg_;
+  std::mutex msg_mutex_;
 };
 
 }  // namespace robot_bt_pet_tracker
 
-#endif  // ROBOT_BT_PETTRACKER_PATROL_HPP_
+#endif  // ROBOT_BT_PETTRACKER_FINDPET_HPP_

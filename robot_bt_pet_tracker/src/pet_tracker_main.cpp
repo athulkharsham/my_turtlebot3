@@ -21,6 +21,7 @@ int main(int argc, char * argv[])
   BT::SharedLibrary loader;
 
   factory.registerFromPlugin(loader.getOSName("robot_patrol_bt_node"));
+  factory.registerFromPlugin(loader.getOSName("robot_find_pet_bt_node"));
   factory.registerFromPlugin(loader.getOSName("robot_move_bt_node"));
   factory.registerFromPlugin(loader.getOSName("robot_get_waypoint_bt_node"));
   factory.registerFromPlugin(loader.getOSName("robot_follow_bt_node"));
