@@ -76,35 +76,26 @@ ros2 launch explore_lite explore.launch.py
 ```sh
 ros2 topic pub /explore/resume std_msgs/msg/Bool "data: true"
 ```
-## Tracker
-Follow person, pet using yolov8 and cv2
+## Pet Tracker using Behaviour Tree
+Track a pet such as cat or dog using yolov8 and cv2, It can follow a person too.
 
-To begin with
-
-1. Start the empty world with turtlebot3
+1. Start Gazebo simulation and start yolov8 with tracker
 ```sh
-ros2 launch turtlebot3_gazebo empty_world.launch.py
+ros2 launch turtlebot_bringup simulated_robot.launch.py
 ```
-2. Start yolov8 with tracker
+2. Start navigation using a known map.
 ```sh
-ros2 launch yolobot_recognition launch_yolov8.launch.py
+ros2 launch turtlebot3_gazebo navigation2.launch.py map:=src/turtlebot3_gazebo/maps/map_my_house.yaml
 ```
-3. Start Per tracker node
+3. Run groot to see the behaviour tree working
 ```sh
-ros2 run pet_tracker pet_tracker
+ros2 run groot Groot
 ```
-4. Start RVIZ2
+4. Start Pet tracker node
 ```sh
-rviz2
+ros2 run robot_bt_pet_tracker pet_tracker_main
 ```
-4. To move person in gazebo
+5. To move a pet in Gazebo. First add the cat model in Gazebo.
 ```sh
-ros2 topic pub /demo/cmd_demo geometry_msgs/msg/Twist "linear:
-  x: 0.0
-  y: -0.15
-  z: 0.0
-angular:
-  x: 0.0
-  y: 0.0
-  z: 0.0"
+ros2 run turtlebot3_teleop teleop_keyboard --ros-args --remap /cmd_vel:=/demo/cmd_demo
 ```
