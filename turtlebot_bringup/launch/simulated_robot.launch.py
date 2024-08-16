@@ -53,6 +53,15 @@ def generate_launch_description():
             "aruco_recognition.launch.py"
         ),
     )
+
+    yoloV8_tracker = IncludeLaunchDescription(
+        os.path.join(
+            get_package_share_directory("yolobot_recognition"),
+            "launch",
+            "launch_yolov8.launch.py"
+        ),
+    )
+
     return LaunchDescription([
         gazebo,
         stateMachine,
@@ -62,4 +71,5 @@ def generate_launch_description():
             period=10.0,
             actions=[aruco]
         ),
+        yoloV8_tracker,
     ])
