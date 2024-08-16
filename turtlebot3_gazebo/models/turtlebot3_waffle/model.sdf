@@ -37,6 +37,20 @@
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_3::base_link::base_visual_MATERIAL_</name>
+          </script>
+          <ambient>0.467 0.463 0.482 1</ambient>
+          <diffuse>0.467 0.463 0.482 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
     </link>
 
@@ -117,6 +131,7 @@
             <length>0.055</length>
           </cylinder>
         </geometry>
+
       </collision>
 
       <visual name="lidar_sensor_visual">
@@ -126,7 +141,25 @@
             <uri>model://turtlebot3_common/meshes/lds.dae</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
+
         </geometry>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_6::base_scan::lidar_sensor_visual_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+          <ambient>0.141 0.122 0.192 1</ambient>
+          <diffuse>0.141 0.122 0.192 1</diffuse>
+          <specular>0.141 0.122 0.192 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+
+
       </visual>
 
       <sensor name="hls_lfcd_lds" type="ray">
@@ -220,6 +253,19 @@
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_3::wheel_right_link::wheel_right_visual_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+          <ambient>1 0.471 0 1</ambient>
+          <diffuse>1 0.471 0 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
       </visual>
     </link>
 
@@ -278,6 +324,19 @@
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_3::wheel_right_link::wheel_right_visual_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+          <ambient>1 0.471 0 1</ambient>
+          <diffuse>1 0.471 0 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
       </visual>
     </link>
 
