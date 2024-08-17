@@ -4,6 +4,7 @@
     <BehaviorTree ID="BehaviorTree">
         <KeepRunningUntilFailure>
             <Sequence>
+                <Condition ID="BeginTracker"/>
                 <Fallback>
                     <Inverter>
                         <Action ID="GetWaypoint" waypoint="{wp}" wp_id="next"/>
@@ -11,10 +12,7 @@
                     <Inverter>
                         <Action ID="Move" goal="{wp}"/>
                     </Inverter>
-                    <Parallel failure_threshold="1" success_threshold="1">
-                        <Action ID="Patrol"/>
-                        <Action ID="FindPet"/>
-                    </Parallel>
+                    <Action ID="Patrol"/>
                 </Fallback>
                 <Action ID="Follow"/>
             </Sequence>
@@ -22,14 +20,14 @@
     </BehaviorTree>
     <!-- ////////// -->
     <TreeNodesModel>
-        <Action ID="FindPet"/>
+        <Condition ID="BeginTracker"/>
         <Action ID="Follow"/>
         <Action ID="GetWaypoint">
-            <output_port name="waypoint"/>
-            <input_port name="wp_id"/>
+            <output_port name="waypoint" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="wp_id" type="std::string"/>
         </Action>
         <Action ID="Move">
-            <input_port name="goal"/>
+            <input_port name="goal" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
         </Action>
         <Action ID="Patrol"/>
     </TreeNodesModel>
