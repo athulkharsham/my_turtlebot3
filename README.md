@@ -85,7 +85,7 @@ ros2 launch turtlebot_bringup simulated_robot.launch.py
 ```
 2. Start navigation using a known map.
 ```sh
-ros2 launch turtlebot3_gazebo navigation2.launch.py map:=src/turtlebot3_gazebo/maps/map_my_house.yaml
+ros2 launch turtlebot3_gazebo navigation2.launch.py map:=src/turtlebot3_gazebo/maps/robot_house.yaml
 ```
 3. Run groot to see the behaviour tree working
 ```sh
