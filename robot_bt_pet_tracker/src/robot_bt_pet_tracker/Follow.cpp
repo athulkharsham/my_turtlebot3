@@ -77,8 +77,10 @@ Follow::tick()
   std::lock_guard<std::mutex> lock(mutex_);
   for(long unsigned int i = 0 ; i < last_inference_msg_.yolov8_inference.size(); i++)
   {
-    if(last_inference_msg_.yolov8_inference[i].class_name == "cat"|| 
-      last_inference_msg_.yolov8_inference[i].class_name == "dog")
+    if(last_inference_msg_.yolov8_inference[i].class_name == "cat" || 
+       last_inference_msg_.yolov8_inference[i].class_name == "dog" ||
+       last_inference_msg_.yolov8_inference[i].class_name == "horse"
+       )
     {
       float distance_to_center = 0;
       auto top = last_inference_msg_.yolov8_inference[0].top;
