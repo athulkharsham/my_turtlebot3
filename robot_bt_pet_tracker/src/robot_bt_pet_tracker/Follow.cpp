@@ -34,49 +34,18 @@ Follow::Follow(
 
 void Follow::yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg)
 {
-  geometry_msgs::msg::Twist vel_msg;  
-
-  for(long unsigned int i = 0 ; i < msg.yolov8_inference.size(); i++)
-  {
-    if(msg.yolov8_inference[i].class_name == "cat"|| 
-      msg.yolov8_inference[i].class_name == "dog")
-    {
-      auto top = msg.yolov8_inference[0].top;
-      auto left = msg.yolov8_inference[0].left;
-      auto bottom = msg.yolov8_inference[0].bottom;
-      auto right = msg.yolov8_inference[0].right;
-      {
-        std::lock_guard<std::mutex> lock(mutex_);
-        center_x_ = top + (bottom-top)/2;
-        center_y_ = left + (right-left)/2;
-      }
-
-      cv::Rect pet_obj(top, left, bottom-top, right-left);
-      designateControl(vel_msg, pet_obj, image_width_);
-      vel_pub_->publish(vel_msg);
-    }
-  }
+  std::lock_guard<std::mutex> lock(mutex_);
+  last_inference_msg_ = msg;
 }
 
 void Follow::depthImageCallback(const sensor_msgs::msg::Image::SharedPtr msg)
 {
-  cv::Mat depth_image = cv_bridge::toCvShare(msg, "32FC1")->image;
-  if(center_y_!=0 && center_x_!=0)
-  {
-    float depth_value = depth_image.at<float>(center_y_, center_x_);
-    if(depth_value < 5.0)
-    {
-      center_distance_ = depth_value;
-    }
-    else
-    {
-      depth_value = 0.0;
-      center_distance_ = depth_value;
-    }
-  }
+  std::lock_guard<std::mutex> lock(mutex_);
+  depth_image_msg_ = msg;
 }
 
-void Follow::designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj, uint32_t img_width)
+void Follow::designateControl(geometry_msgs::msg::Twist &vel_msg, 
+  cv::Rect obj, uint32_t img_width, float distance_to_center)
 {
 
   int obj_x_center = obj.x + obj.width / 2;
@@ -85,16 +54,16 @@ void Follow::designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj, 
 
   const double FIXED_DISTANCE = 0.5;
 
-  if ((ang_vel >= -MAX_ANG_VEL && ang_vel <= -MIN_ANG_VEL) || (ang_vel >= MIN_ANG_VEL && ang_vel <= MAX_ANG_VEL)) 
+  if ((ang_vel >= -MAX_ANG_VEL && ang_vel <= -MIN_ANG_VEL) || 
+      (ang_vel >= MIN_ANG_VEL && ang_vel <= MAX_ANG_VEL)) 
   {
     vel_msg.angular.z = ang_vel;
   }
-  if(center_distance_ > 0.8 && center_distance_!= 0.0)
+  if(distance_to_center > 0.8 && distance_to_center!= 0.0)
   {
-    vel_msg.linear.x = (center_distance_ - FIXED_DISTANCE) * 0.65;
+    vel_msg.linear.x = (distance_to_center - FIXED_DISTANCE) * 0.65;
   }
 }
-
 
 void
 Follow::halt()
@@ -105,6 +74,43 @@ Follow::halt()
 BT::NodeStatus
 Follow::tick()
 {
+  std::lock_guard<std::mutex> lock(mutex_);
+  for(long unsigned int i = 0 ; i < last_inference_msg_.yolov8_inference.size(); i++)
+  {
+    if(last_inference_msg_.yolov8_inference[i].class_name == "cat"|| 
+      last_inference_msg_.yolov8_inference[i].class_name == "dog")
+    {
+      float distance_to_center = 0;
+      auto top = last_inference_msg_.yolov8_inference[0].top;
+      auto left = last_inference_msg_.yolov8_inference[0].left;
+      auto bottom = last_inference_msg_.yolov8_inference[0].bottom;
+      auto right = last_inference_msg_.yolov8_inference[0].right;
+      int center_x = top + (bottom-top)/2;
+      int center_y = left + (right-left)/2;
+
+      cv::Rect pet_obj(top, left, bottom-top, right-left);
+      cv::Mat depth_image = cv_bridge::toCvShare(depth_image_msg_, "32FC1")->image;
+
+      /* Calculate distance to the center point*/
+      if(center_y!=0 && center_x!=0)
+      {
+        distance_to_center = depth_image.at<float>(center_y, center_x);
+        if(distance_to_center > 5.0)
+        {
+          distance_to_center = 0.0;
+        }
+      }
+
+      geometry_msgs::msg::Twist vel_msg;
+
+      designateControl(vel_msg, pet_obj, image_width_, distance_to_center);
+      vel_pub_->publish(vel_msg);
+    }
+  }
+
+
+
+
   return BT::NodeStatus::RUNNING;
 }
 

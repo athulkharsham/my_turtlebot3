@@ -23,7 +23,7 @@ class Follow : public BT::ActionNodeBase
 public:
   constexpr static float MIN_ANG_VEL = 0.15f;
   constexpr static float MAX_ANG_VEL = 0.5f;
-  constexpr static float ANGULAR_GAIN = 1.7f;
+  constexpr static float ANGULAR_GAIN = 1.2f;
   explicit Follow(
     const std::string & xml_tag_name,
     const BT::NodeConfiguration & conf);
@@ -38,7 +38,7 @@ public:
 
 private:
   rclcpp::Node::SharedPtr node_;
-  void designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj, uint32_t img_width);
+  void designateControl(geometry_msgs::msg::Twist &vel_msg, cv::Rect obj, uint32_t img_width, float distance_to_center);
   void yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg);
   void depthImageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
 
@@ -47,11 +47,11 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr depth_image_sub_;
 
   cv::Ptr<cv::Tracker> tracker_;
-  bool is_tracker_initialized_;
-  float center_distance_;
-  int center_x_, center_y_;
   int image_width_ = 640;
   std::mutex mutex_;
+
+  yolov8_msgs::msg::Yolov8Inference last_inference_msg_;
+  sensor_msgs::msg::Image::SharedPtr depth_image_msg_;
 };
 
 }  // namespace robot_bt_pet_tracker

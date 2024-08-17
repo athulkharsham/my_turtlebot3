@@ -33,6 +33,11 @@ private:
   rclcpp::Node::SharedPtr node_;
   rclcpp::Time start_time_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr vel_pub_;
+  rclcpp::Subscription<yolov8_msgs::msg::Yolov8Inference>::SharedPtr yolo_sub_;
+  yolov8_msgs::msg::Yolov8Inference last_inference_msg_;
+  std::mutex msg_mutex_;
+
+  void yoloCallback(const yolov8_msgs::msg::Yolov8Inference &msg);
 };
 
 }  // namespace robot_bt_pet_tracker

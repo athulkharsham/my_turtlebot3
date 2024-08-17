@@ -20,6 +20,7 @@ int main(int argc, char * argv[])
   BT::BehaviorTreeFactory factory;
   BT::SharedLibrary loader;
 
+  factory.registerFromPlugin(loader.getOSName("robot_begin_tacker_bt_node"));
   factory.registerFromPlugin(loader.getOSName("robot_patrol_bt_node"));
   factory.registerFromPlugin(loader.getOSName("robot_find_pet_bt_node"));
   factory.registerFromPlugin(loader.getOSName("robot_move_bt_node"));
@@ -35,7 +36,7 @@ int main(int argc, char * argv[])
 
   auto publisher_zmq = std::make_shared<BT::PublisherZMQ>(tree, 10, 2666, 2667);
 
-  rclcpp::Rate rate(10);
+  rclcpp::Rate rate(30);
 
   bool finish = false;
   while (!finish && rclcpp::ok()) {
