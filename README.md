@@ -101,4 +101,29 @@ ros2 run turtlebot3_teleop teleop_keyboard --ros-args --remap /cmd_vel:=/demo/cm
 ```
 
 ## Web application
+In this video, we can see a web application to control the robot, visualize real time robot's location in map start pet tracking, live camera view and more..
+
 [![Watch the video](https://img.youtube.com/vi/l0P7VqYzA0s/0.jpg)](https://www.youtube.com/watch?v=l0P7VqYzA0s)
+
+*Click the thumbnail above to watch the video on YouTube.*
+
+## Frontier Exploration
+In this video, robot explores autonomusly based on frontier exploration.
+
+[![Watch the video](https://img.youtube.com/vi/YsMwH4HtKnM/0.jpg)](https://www.youtube.com/watch?v=YsMwH4HtKnM)
+
+*Click the thumbnail above to watch the video on YouTube.*
+
+## Autonomous Docking
+In this video, robot autonomously docks from different position, based on aruco marker. 
+
+[![Watch the video](https://img.youtube.com/vi/jc0nPZG8PCU/0.jpg)](https://www.youtube.com/watch?v=jc0nPZG8PCU)
+
+*Click the thumbnail above to watch the video on YouTube.*
+
+## Pet Tracker
+In this video, robot autonomusly tracks pet. First it searches for the pet in different rooms. if it finds then it starts tracking. This is implemented based on behavior tree.
+
+[![Watch the video](https://img.youtube.com/vi/58AYHjtZx28/0.jpg)](https://www.youtube.com/watch?v=58AYHjtZx28)
+
+*Click the thumbnail above to watch the video on YouTube.*
