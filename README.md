@@ -124,6 +124,6 @@ In this video, robot autonomously docks from different position, based on aruco 
 ## Pet Tracker
 In this video, robot autonomusly tracks pet. First it searches for the pet in different rooms. if it finds then it starts tracking. This is implemented based on behavior tree.
 
-[![Watch the video](https://img.youtube.com/vi/58AYHjtZx28/0.jpg)](https://www.youtube.com/watch?v=58AYHjtZx28)
+[![Watch the video](https://img.youtube.com/vi/xJ_FOTmKXiw/0.jpg)](https://www.youtube.com/watch?v=xJ_FOTmKXiw)
 
 *Click the thumbnail above to watch the video on YouTube.*
