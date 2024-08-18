@@ -22,6 +22,11 @@ find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+
+
 
 find_package(ZMQ)
 if(ZMQ_FOUND)
@@ -44,6 +49,9 @@ set(dependencies
     sensor_msgs
     OpenCV
     cv_bridge
+    tf2_geometry_msgs
+    tf2
+    tf2_ros
 )
 
 include_directories(include ${ZMQ_INCLUDE_DIRS})

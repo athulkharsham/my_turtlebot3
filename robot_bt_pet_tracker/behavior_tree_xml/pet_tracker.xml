@@ -9,10 +9,13 @@
                     <Inverter>
                         <Action ID="GetWaypoint" waypoint="{wp}" wp_id="next"/>
                     </Inverter>
-                    <Inverter>
-                        <Action ID="Move" goal="{wp}"/>
-                    </Inverter>
-                    <Action ID="Patrol"/>
+                    <Parallel failure_threshold="1" success_threshold="1">
+                        <Action ID="FindPet"/>
+                        <Sequence>
+                            <Action ID="Move" goal="{wp}"/>
+                            <Action ID="Patrol"/>
+                        </Sequence>
+                    </Parallel>
                 </Fallback>
                 <Action ID="Follow"/>
             </Sequence>
@@ -21,6 +24,7 @@
     <!-- ////////// -->
     <TreeNodesModel>
         <Condition ID="BeginTracker"/>
+        <Action ID="FindPet"/>
         <Action ID="Follow"/>
         <Action ID="GetWaypoint">
             <output_port name="waypoint" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>

@@ -72,7 +72,6 @@ FindPet::tick()
     if (last_inference_msg_.yolov8_inference[i].class_name == "cat" ||
         last_inference_msg_.yolov8_inference[i].class_name == "dog")
     {
-      RCLCPP_INFO(node_->get_logger(), "Pet Found!!");
       auto top = last_inference_msg_.yolov8_inference[0].top;
       auto left = last_inference_msg_.yolov8_inference[0].left;
       auto bottom = last_inference_msg_.yolov8_inference[0].bottom;
@@ -86,6 +85,7 @@ FindPet::tick()
       vel_pub_->publish(vel_msg);
       if(is_aligned_)
       {
+        RCLCPP_INFO(node_->get_logger(), "Pet Found!!");
         return BT::NodeStatus::SUCCESS;
       }
     }

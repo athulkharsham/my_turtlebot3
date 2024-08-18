@@ -16,6 +16,7 @@
   <depend>geometry_msgs</depend>
   <depend>nav2_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>tf2_ros</depend>
   <depend>sensor_msgs</depend>
   <depend>OpenCV</depend>
   <depend>cv_bridge</depend>
