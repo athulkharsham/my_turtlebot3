@@ -25,16 +25,6 @@
           </box>
         </geometry>
       </collision>
-      <collision name="cat">
-        <pose>0 0 -0.02 0 -0 1.57</pose>
-        <geometry>
-          <mesh>
-            <uri>model://cat/meshes/cat/12221_Cat_v1_l3.obj</uri>
-            <scale>0.007 0.007 0.007</scale>
-          </mesh>
-        </geometry>
-      </collision>
-
       <visual name="cat">
         <pose>0 0 -0.02 0 -0 1.57</pose>
         <geometry>
