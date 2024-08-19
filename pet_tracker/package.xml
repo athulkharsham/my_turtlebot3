@@ -16,6 +16,8 @@
   <depend>OpenCV</depend>
   <depend>cv_bridge</depend>
   <depend>yolov8_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
